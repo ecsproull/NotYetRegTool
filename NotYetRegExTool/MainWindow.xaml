@@ -1,0 +1,220 @@
+﻿<Window x:Class="NotYetRegExTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ed's Awesome Regex Tool" Height="750" Width="1000">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="*" MaxWidth="200"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+        <TabControl Name="SearchTabControl" SelectionChanged="SearchTabControl_SelectionChanged" Grid.RowSpan="2">
+            <TabItem Name="StringSearch" Header="String Search">
+                <ScrollViewer>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <RichTextBox Name="FilePath" FontSize="14" IsReadOnly="True" />
+                        <RichTextBox Grid.Row="1" Name="SearchText" FontSize="14" TextChanged="SearchText_TextChanged" KeyDown="SearchText_KeyDown" />
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Name="FileSearch" Header="File Search">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel  HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0">
+                            <Label Content="Search Path" />
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox Name="FileSearchPathComboBox" Width="250" Height="20" IsEditable="True"  PreviewKeyDown="ComboBox_KeyDown" />
+                                <Button Name="FileMatchDirectoryButton" Content="!" VerticalAlignment="Stretch" Width="20"  Style="{DynamicResource ButtonStyle1}" Click="GetDirectory_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel  HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0">
+                            <Label Content="File Match, Regex" />
+                            <ComboBox Name="FileMatchPattern" Width="150" Height="20" IsEditable="True"  PreviewKeyDown="ComboBox_KeyDown"/>
+                        </StackPanel>
+                        <StackPanel  HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0">
+                            <Label Content="File Ignore Match, Regex"  ></Label>
+                            <ComboBox Name="FileIgnorePattern" Width="150" Height="20" IsEditable="True"  PreviewKeyDown="ComboBox_KeyDown"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <ListView Grid.Row="1" Background="AliceBlue" Name="FoundMatchesListView" SelectionChanged="FoundMatchesListView_SelectionChanged">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Height="40">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="20" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                        <TextBlock Text="{Binding LineNumber}" FontWeight="Bold" Width="30" />
+                                        <Button 
+                                            Click="FileLinkText_Click" 
+                                            Name="FileLinkText" 
+                                            Content="{Binding FileName}" 
+                                            Foreground="Blue" 
+                                            Cursor="Hand" 
+                                            MouseRightButtonUp="FileLinkText_MouseRightButtonUp">
+                                            <Button.ToolTip>
+                                                <ToolTip>
+                                                    <StackPanel>
+                                                        <TextBlock Text="Left Click to navigate." />
+                                                        <TextBlock Text="Right Click to copy" />
+                                                    </StackPanel>
+                                                </ToolTip>
+                                            </Button.ToolTip>
+                                        </Button>
+                                    </StackPanel>
+                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding LineText}"  />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </TabItem>
+            <TabItem Name="StringReplace" Header="Replace String">
+                <ScrollViewer>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="25" />
+                            </Grid.RowDefinitions>
+                            <RichTextBox Grid.Row="1" Name="ReplacementText" FontSize="14" TextChanged="SearchText_TextChanged" KeyDown="SearchText_KeyDown" />
+                            <RichTextBox Grid.Row="0" Name="OriginalText" FontSize="14" TextChanged="SearchText_TextChanged" KeyDown="SearchText_KeyDown" />
+                        </Grid>
+                        <RichTextBox Grid.Column="1" Name="AlteredText" FontSize="14" TextChanged="SearchText_TextChanged" KeyDown="SearchText_KeyDown" />
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="2" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="129*"/>
+                <ColumnDefinition Width="268*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <ComboBox Name="PatternList" Height="20" HorizontalAlignment="Stretch" SelectionChanged="PatternList_SelectionChanged"  PreviewKeyDown="ComboBox_KeyDown" Grid.ColumnSpan="2" Margin="0,0,-0.4,0">
+                <ComboBoxItem IsSelected="True" Content="Saved Patterns" IsEnabled="True" />
+            </ComboBox>
+            <RichTextBox Grid.Row="1"  Name="Pattern" FontSize="14" TextChanged="Pattern_TextChanged" Background="AliceBlue" Grid.ColumnSpan="2" Margin="0,0,-0.4,-0.8"></RichTextBox>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="20" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="75" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1" Grid.Row="1" Name="ApplyButton" Content="Apply" Width="50" Height="25" Click="Apply_Click"  Style="{DynamicResource ButtonStyle1}" />
+                <Button Grid.Row="3" Name="BackButton" Content="Back" HorizontalAlignment="Right" Height="20" Width="60" Click="BringIntoView_Click" IsEnabled="False" />
+                <Button Grid.Column="1" Grid.Row="3" Name="SaveButton" Content="Save" Width="50" Height="25" Click="Save_Click"  Style="{DynamicResource ButtonStyle1}" />
+                <Button Grid.Row="3" Grid.Column="2" Name="ForwardButton" Content="Forward" HorizontalAlignment="Left" Height="20" Width="60" Click="BringIntoView_Click" IsEnabled="False" />
+            </Grid>
+            <ListView Grid.Row="1" x:Name="Matches_ListView">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="14" />
+                                <RowDefinition Height="14" />
+                                <RowDefinition Height="2" />
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Index: " />
+                                <TextBlock Text="{Binding Index}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="5,0,0,0">
+                                <TextBlock Text="Length: " />
+                                <TextBlock  Text="{Binding Length}" />
+                            </StackPanel>
+                            <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Value}" />
+                            <Separator Background="Black" Height="2" Grid.Row="2" Grid.ColumnSpan="2" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <TextBlock Name="ProgressText" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Text="Search Progress" />
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="1" Grid.RowSpan="2">
+            <ScrollViewer>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="IgnoreCase" Style="{DynamicResource Checkbox1}" Checked="RegexOptionChanged" Unchecked="RegexOptionChanged" Tag="1" />
+                        <Label Content="IgnoreCase" VerticalAlignment="Center"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="Multiline" Style="{DynamicResource Checkbox1}" Checked="RegexOptionChanged" Unchecked="RegexOptionChanged" Tag="2" />
+                        <Label Content="Multiline" VerticalAlignment="Center"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="ExplicitCapture" Style="{DynamicResource Checkbox1}" Checked="RegexOptionChanged" Unchecked="RegexOptionChanged" Tag="4" />
+                        <Label Content="ExplicitCapture" VerticalAlignment="Center"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="Compiled" Style="{DynamicResource Checkbox1}" Checked="RegexOptionChanged" Unchecked="RegexOptionChanged" Tag="8" />
+                        <Label Content="Compiled" VerticalAlignment="Center"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="Singleline" Style="{DynamicResource Checkbox1}" Checked="RegexOptionChanged" Unchecked="RegexOptionChanged" Tag="16" />
+                        <Label Content="Singleline" VerticalAlignment="Center"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="IgnorePatternWhitespace" Style="{DynamicResource Checkbox1}" Checked="RegexOptionChanged" Unchecked="RegexOptionChanged" Tag="32" />
+                        <Label Content="IgnorePatternWhitespace" VerticalAlignment="Center"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="RightToLeft" Style="{DynamicResource Checkbox1}" Checked="RegexOptionChanged" Unchecked="RegexOptionChanged" Tag="64" />
+                        <Label Content="RightToLeft" VerticalAlignment="Center"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="ECMAScript" Style="{DynamicResource Checkbox1}" Checked="RegexOptionChanged" Unchecked="RegexOptionChanged" Tag="256" />
+                        <Label Content="ECMAScript" VerticalAlignment="Center"></Label>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="CultureInvariant" Style="{DynamicResource Checkbox1}" Checked="RegexOptionChanged" Unchecked="RegexOptionChanged" Tag="512" />
+                        <Label Content="CultureInvariant" VerticalAlignment="Center"></Label>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>
